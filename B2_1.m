@@ -1,4 +1,4 @@
-%% QU 1
+%% PARAMS
 
 tau_m = 10; %ms
 V_rest = -70; %mV
@@ -11,7 +11,7 @@ G = 1/R_m;
 t = 0:dt:T;
 steps = T/dt;
 
-%%
+%% QU 1
 I = 3.1; %nA
 V = V_rest*ones(1,steps+1);
 
@@ -22,10 +22,17 @@ for j = 1:steps
     end        
 end
 
-figure()
-plot(V)
+figure
+plot(t, V, 'lineWidth', 1.5)
+set(gca, 'Fontsize', 14)
+title(sprintf('LIF simulation, input current = %.1fnA', I))
+xlabel('time /ms')
+ylabel('Membrane Voltage /mV')
+xlim([0,1000])
+saveas(gcf, 'figs/png/B2_1_q1.png')
+saveas(gcf, 'figs/mat/B2_1_q1.fig')
 
-%%
+%% QU 3
 I = 2.9; %nA
 V = V_rest*ones(1,steps+1);
 
@@ -36,8 +43,16 @@ for j = 1:steps
     end        
 end
 
-figure()
-plot(V)
+figure
+plot(t, V, 'lineWidth', 1.5)
+set(gca, 'Fontsize', 14)
+title(sprintf('LIF simulation, input current = %.1fnA', I))
+xlabel('time /ms')
+ylabel('Membrane Voltage /mV')
+xlim([0,1000])
+%legend(sprintf('I = %.1fnA', I))
+saveas(gcf, 'figs/png/B2_1_q3.png')
+saveas(gcf, 'figs/mat/B2_1_q3.fig')
 
 %%
 I_trials = 2:0.1:5;
@@ -56,7 +71,17 @@ for k = 1:n_trials
     end
 end
 
-rates = spike_counts/T;
+rates = spike_counts*1000/T;
+
+figure
+plot(I_trials, rates, 'lineWidth', 1.5)
+set(gca, 'Fontsize', 14)
+title('Firing rate of LIF model as function of input current')
+xlabel('Input current /nA')
+ylabel('Firing rate /s^{-1}')
+%legend(sprintf('I = %.1fnA', I))
+saveas(gcf, 'figs/png/B2_1_q4.png')
+saveas(gcf, 'figs/mat/B2_1_q4.fig')
+
 %%
-figure()
-plot(I_trials, rates)
+
