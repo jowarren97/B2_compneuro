@@ -142,13 +142,11 @@ col2 = condition2(:,col2);
 %%
 spiketimes1{1}
 plotraster(spiketimes1)
-set(gca, 'Fontsize', 14)
 saveas(gcf, 'figs/png/B2_2_q13.png')
 saveas(gcf, 'figs/mat/B2_2_q13.fig')
 
 %%
 plotPSTH(spiketimes1, 10)
-set(gca, 'Fontsize', 14)
 title("PSTH of 'spiketimes1'")
 saveas(gcf, 'figs/png/B2_2_q14.png')
 saveas(gcf, 'figs/mat/B2_2_q14.fig')

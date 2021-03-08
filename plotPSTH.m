@@ -22,5 +22,6 @@ function [] = plotPSTH(spiketimes, dt)
     ylabel('spike rate /s^{-1}')
     xlim([0, t_end])
     title('PSTH')
+    set(gca, 'Fontsize', 14)
 end
 

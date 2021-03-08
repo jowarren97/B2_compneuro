@@ -11,20 +11,34 @@ function [] = computeSTA(spiketimes, stim, t_steps)
     all_spike_times = [spiketimes{:}];
     n_spikes = length(all_spike_times);
     
-    figure    
+    fig = figure
+    
     for i = 1:n_spikes
         ts = all_spike_times(i);
         col = ceil(ts/6.25);
         sta = sta + stim(:,col-15:col-1);
         imagesc(t_ax, f, sta/i) %need to divide by i to normalise average
+        cb = colorbar;
+        %cb.Title.String('Average amplitude /dB')
+        set(get(cb,'Title'),'String','Average amplitude /dB')
+        axis xy
+        title('Spike triggered average')
+        xlabel('Time preceding spike /ms')
+        ylabel('Frequency /Hz')
+        set(gca, 'Fontsize', 14)
+        
         drawnow;
+        
+        %generates gif
+        frame = getframe(fig); 
+        im = frame2im(frame); 
+        [imind,cm] = rgb2ind(im,256); 
+        % Write to the GIF File 
+        if i == 1 
+          imwrite(imind,cm,'figs/STA.gif','gif', 'Loopcount',inf); 
+        else 
+          imwrite(imind,cm,'figs/STA.gif','gif','WriteMode','append'); 
+        end 
     end
-    
-    cb = colorbar;
-    cb.Title.String('Average amplitude /dB')
-    axis xy
-    title('Spike triggered average')
-    xlabel('Time preceding spike /ms')
-    ylabel('Frequency /Hz')
 end
 
