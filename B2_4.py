@@ -3,7 +3,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 
-def runNet(data, n_h1=100, n_h2=80, weight_scale=0.01, save=True):
+def runNet(data, alpha, n_h1=100, n_h2=80, weight_scale=0.01, max_itr=5000, save=True):
     n_inp = data['X_train'].shape[0]
 
     w3 = weight_scale*np.random.normal(size=(1,n_h2))
@@ -97,17 +97,15 @@ plt.show()
 
 
 P = data['X_train'].shape[1]
-max_itr = 5000
-alpha = 0.1/P
-
+lr = 0.1/P
 
 #WEIGHTSCALE 0.01 EXPERIMENT
 
-runNet(data)
+runNet(data, alpha=lr)
 
 ##WEIGHTSCALE 0.1 EXPERIMENT
 
-runNet(data, weight_scale=0.1)
+runNet(data, alpha=lr, weight_scale=0.1)
 
 
 
