@@ -1,9 +1,9 @@
 function [] = plotraster(spiketimes)
 %UNTITLED4 Summary of this function goes here
-%   Detailed explanation goes here    
+%   Detailed explanation goes here
     if class(spiketimes) == "cell"
         n_trials = length(spiketimes);
-        figure('Position', [100, 100, 1000, n_trials*50])
+        figure('Position', [100, 100, 1000, n_trials*25])
         hold on
         for i = 1:n_trials %loop thru trials
             indiv_trial = spiketimes{i}; %select data of trial

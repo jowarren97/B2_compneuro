@@ -35,15 +35,23 @@ saveas(gcf, 'figs/png/B2_3_q9.png')
 saveas(gcf, 'figs/mat/B2_3_q9.fig')
 
 %% Q11
-computeSTA(spiketimes, stimulus_ft, 15)
+computeSTA(spiketimes, stimulus_ft, 15, false, false);
 saveas(gcf, 'figs/png/B2_3_q11.png')
 saveas(gcf, 'figs/mat/B2_3_q11.fig')
 
 %% Q12
-allspiketimes = [spiketimes{:}]
+allspiketimes = [spiketimes{:}];
 kernel= separablekernel(stimulus_ft, histc(allspiketimes, t), 15);
 figure
-imagesc(kernel)
+t_ax = - 15*6.25:6.25:0;
+imagesc(t_ax, f, kernel)
+cb = colorbar;
+set(get(cb,'Title'),'String','Average amplitude /dB')
+axis xy
+title('STRF from separable kernel')
+xlabel('Time preceding spike /ms')
+ylabel('Frequency /Hz')
+set(gca, 'Fontsize', 14)
 saveas(gcf, 'figs/png/B2_3_q12.png')
 saveas(gcf, 'figs/mat/B2_3_q12.fig')
 

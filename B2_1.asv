@@ -137,8 +137,7 @@ P = zeros([n_neurons, steps+1]);
 
 for j = 1:steps
     syn_mat = connectivity.*P(:,j);
-    syn_inp(:,j) = - R_m_G_s*syn_mat'*(V(:,j)-E_s);
-    V(:,j+1) = V(:,j) + (1/tau_m)*dt*(R_m_I_e - (V(:,j)-V_rest) + syn_inp(:,j));
+    V(:,j+1) = V(:,j) + (1/tau_m)*dt*(R_m_I_e - (V(:,j)-V_rest) - R_m_G_s*syn_mat'*(V(:,j)-E_s));
     P(:,j+1) = P(:,j)*(1 - (1/tau_s)*dt);
     spiked_bool = V(:,j+1) >= V_thresh
     V(spiked_bool, j+1) = V_reset;
@@ -146,9 +145,7 @@ for j = 1:steps
     spiketrains(:,j+1) = spiked_bool;
 end
 
-fig=figure('Position', [600,600,1000,600])
-
-subplot(2,1,1)
+figure('Position', [600,600,800,400])
 hold on
 plot(t, V, 'lineWidth', 1.5)
 plot(t, V_rest*ones(size(t)), 'k--', 'lineWidth', 1.5)
@@ -163,25 +160,12 @@ set(gca, 'Fontsize', 14)
 xlabel('time /ms')
 ylabel('Membrane Voltage /mV')
 
-subplot(2,1,2)
-plot(t, syn_inp, 'lineWidth', 1.5)
-legend('Neuron 1', 'Neuron 2')
-xlim([0,1000])
-set(gca, 'Fontsize', 14)
-xlabel('time /ms')
-ylabel('Synaptic current /nA')
-
-ax=axes(fig,'visible','off'); 
-ax.Title.Visible='on';
-title(ax, sprintf("Simulation of excitatory LIF population of %d neurons", n_neurons))
-set(gca, 'Fontsize', 14)
-
 %legend(sprintf('I = %.1fnA', I))
 saveas(gcf, 'figs/png/B2_1_q5a.png')
 saveas(gcf, 'figs/mat/B2_1_q5a.fig')
 
 %%
-E_s = -80;
+E_s = -200;
 
 V_init = V_reset+(V_thresh-V_reset)*rand([n_neurons,1]);
 V = repmat(V_init, 1,steps+1);
@@ -190,12 +174,10 @@ V = repmat(V_init, 1,steps+1);
 connectivity = ones(n_neurons, n_neurons) .* ~eye(n_neurons, n_neurons) %remore self connections
 %P = zeros([2,steps+1]); %P = [P_1->2; P_2->1]
 P = zeros([n_neurons, steps+1]);
-syn_inp = zeros([n_neurons, steps+1]);
 
 for j = 1:steps
     syn_mat = connectivity.*P(:,j)
-    syn_inp(:,j) = - R_m_G_s*syn_mat'*(V(:,j)-E_s);
-    V(:,j+1) = V(:,j) + (1/tau_m)*dt*(R_m_I_e - (V(:,j)-V_rest) + syn_inp(:,j));
+    V(:,j+1) = V(:,j) + (1/tau_m)*dt*(R_m_I_e - (V(:,j)-V_rest) - R_m_G_s*syn_mat'*(V(:,j)-E_s));
     P(:,j+1) = P(:,j)*(1 - (1/tau_s)*dt);
     spiked_bool = V(:,j+1) >= V_thresh
     V(spiked_bool, j+1) = V_reset;
@@ -203,9 +185,7 @@ for j = 1:steps
     spiketrains(:,j+1) = spiked_bool;
 end
 
-fig=figure('Position', [600,600,1000,600])
-
-subplot(2,1,1)
+figure('Position', [600,600,800,400])
 hold on
 plot(t, V, 'lineWidth', 1.5)
 plot(t, V_rest*ones(size(t)), 'k--', 'lineWidth', 1.5)
@@ -220,18 +200,8 @@ set(gca, 'Fontsize', 14)
 xlabel('time /ms')
 ylabel('Membrane Voltage /mV')
 
-subplot(2,1,2)
-plot(t, syn_inp, 'lineWidth', 1.5)
-legend('Neuron 1', 'Neuron 2')
-xlim([0,1000])
-set(gca, 'Fontsize', 14)
-xlabel('time /ms')
-ylabel('Synaptic current /nA')
-
-ax=axes(fig,'visible','off'); 
-ax.Title.Visible='on';
-title(ax, sprintf("Simulation of inhibitory LIF population of %d neurons", n_neurons))
-set(gca, 'Fontsize', 14)
+figure
+plot(t, P)
 
 %legend(sprintf('I = %.1fnA', I))
 saveas(gcf, 'figs/png/B2_1_q5b.png')

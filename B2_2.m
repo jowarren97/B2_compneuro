@@ -36,6 +36,7 @@ for ii = 1:20
  subplot(5,4,ii);
  bar(edges, condition1(ii,:)/0.01,'histc');
  ylim([0, 1000]);
+ title(sprintf('trial %d', ii));
  if ii <= 16
      set(gca, 'xtick', [])
  end
@@ -95,25 +96,25 @@ saveas(gcf, 'figs/png/B2_2_q9.png')
 saveas(gcf, 'figs/mat/B2_2_q9.fig')
 
 %% 
-% figure()
-% mu1 = mean(condition1)/0.01;
-% sigma1 = std(condition1)/0.01;
-% standard_error1 = sigma1/sqrt(20);
-% bar(edges, mu1, 'histc')
-% hold all
-% errorbar(edges+5, mu1, standard_error1, 'LineStyle', 'none')
-% hold off
-% ylim([0,800])
-% 
-% figure()
-% mu2 = mean(condition2)/0.01;
-% sigma2 = std(condition2)/0.01;
-% standard_error2 = sigma2/sqrt(20);
-% bar(edges, mu2, 'histc')
-% hold all
-% errorbar(edges+5, mu2, standard_error2, 'LineStyle', 'none')
-% hold off
-% ylim([0,800])
+figure()
+mu1 = mean(condition1)/0.01;
+sigma1 = std(condition1)/0.01;
+standard_error1 = sigma1/sqrt(20);
+bar(edges, mu1, 'histc')
+hold all
+errorbar(edges+5, mu1, standard_error1, 'LineStyle', 'none')
+hold off
+ylim([0,800])
+
+figure()
+mu2 = mean(condition2)/0.01;
+sigma2 = std(condition2)/0.01;
+standard_error2 = sigma2/sqrt(20);
+bar(edges, mu2, 'histc')
+hold all
+errorbar(edges+5, mu2, standard_error2, 'LineStyle', 'none')
+hold off
+ylim([0,800])
 
 figure('Position', [10 10 800 600])
 hold all
@@ -132,12 +133,36 @@ saveas(gcf, 'figs/png/B2_2_q10.png')
 saveas(gcf, 'figs/mat/B2_2_q10.fig')
 
 %%
-col1 = ismember(sigma1, max(sigma1(:)));
-col1 = condition1(:,col1);
-col2 = ismember(sigma2, max(sigma2(:)));
-col2 = condition2(:,col2);
+diff = abs(mu1-mu2);
 
-%????
+col = ismember(diff, max(diff));
+
+col1 = condition1(:,col);
+col2 = condition2(:,col);
+
+figure('Position', [600 600 600 300])
+subplot(2,1,1)
+[H, P] = ttest2(condition1, condition2, 'alpha', 0.01)
+bar(edges,H)
+yticks([0,1])
+title("p < 0.01")
+yticklabels({'Accept H_{0}', 'Reject H_{0}'})
+xlim([0 1000])
+
+%ylabel("Reject null hypothesis")
+subplot(2,1,2)
+[H, P] = ttest2(condition1, condition2, 'alpha', 0.001)
+bar(edges,H)
+yticks([0,1])
+title("p < 0.001")
+yticklabels({'Accept H_{0}', 'Reject H_{0}'})
+xlim([0 1000])
+xlabel('time /ms')
+
+%ylabel("Reject null hypothesis")
+
+saveas(gcf, 'figs/png/B2_2_q12.png')
+saveas(gcf, 'figs/mat/B2_2_q12.fig')
 
 %%
 spiketimes1{1}
