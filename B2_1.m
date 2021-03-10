@@ -134,6 +134,7 @@ V = repmat(V_init, 1,steps+1);
 connectivity = ones(n_neurons, n_neurons) .* ~eye(n_neurons, n_neurons) %remore self connections
 %P = zeros([2,steps+1]); %P = [P_1->2; P_2->1]
 P = zeros([n_neurons, steps+1]);
+syn_inp = zeros([n_neurons, steps+1]);
 
 for j = 1:steps
     syn_mat = connectivity.*P(:,j);
