@@ -237,3 +237,107 @@ set(gca, 'Fontsize', 14)
 %legend(sprintf('I = %.1fnA', I))
 saveas(gcf, 'figs/png/B2_1_q5b.png')
 saveas(gcf, 'figs/mat/B2_1_q5b.fig')
+
+
+%%
+clear all
+close all
+
+%net params
+learning = false;
+n_neurons = 100; %nb recurr conn neurons
+n_inp = 1; %nb input channels
+conn_rec = ones([n_neurons, n_neurons]);
+conn_fwd = ones([n_inp, n_neurons]);
+regL2 = 0;
+regL1 = 0;
+
+%neuron params
+tau_m = 20; %ms
+V_reset = -0.5;
+V_thresh = 0.5;
+sigma_V = 10^-2;
+
+%sim params
+dt = 1; %ms
+T = 4000; %ms
+t = 0:dt:T;
+steps = T/dt;
+
+%initialisation
+V_init = V_reset+(V_thresh-V_reset)*rand([n_neurons, 1]);
+V = repmat(V_init, 1, steps+1);
+
+spiketrains = zeros([n_neurons, steps+1]);
+rates = zeros([n_neurons, steps+1]); %filtered/low-pass of spiketrains
+output = zeros([n_inp, steps+1]);
+
+W_fwd = 0.5*random('normal', 0, 1, [n_inp, n_neurons]);
+W_rec = - W_fwd' * W_fwd - regL2*(1/tau_m)*eye([n_neurons, n_neurons]);
+
+V_thresh = 0.5 * diag(W_fwd' * W_fwd) + regL1*(1/tau_m) + regL2*(1/tau_m)^2;
+
+figure
+imagesc(W_fwd)
+title('Initial feedforward weight matrix')
+
+figure
+imagesc(W_rec)
+title('Initial recurrent weight matrix')
+
+omega = 1/4000;
+amplitude = 2;
+x = amplitude * sin(2*pi*omega*t);
+x_dot = amplitude * 2*pi*omega*cos(2*pi*omega*t);
+c = x + (1/tau_m)*x_dot;
+
+for j = 1:steps
+    %c(:,j) = x(:,j+1) - x(:,j) + (1/tau_m)*dt*x(:,j); 
+    
+    syn_mat_fwd = conn_fwd.*W_fwd;
+    syn_mat_rec = conn_rec.*W_rec;
+    
+    syn_inp(:,j) = dt*(1/tau_m) * syn_mat_fwd' * c(:,j) + syn_mat_rec * spiketrains(:,j);
+    
+    V_noise = sigma_V * random('normal', 0, 1, [n_neurons,1]); 
+    
+    V(:,j+1) = V(:,j) - (1/tau_m)*dt*V(:,j) + syn_inp(:,j) + V_noise;
+
+    [V_above_thresh, idx_spiked] = max(V(:,j+1) - V_thresh); %only allow 1 neuron to spike per timestep (compensate for discrete simulation)
+                                        %neuron firing should inhibit neighbours
+                                        %want to take neuron whose V is most above threshold and assume spiked first
+    %spiked_bool = V(:,j+1) >= V_thresh;
+    if V_above_thresh >= 0
+        spiketrains(idx_spiked,j+1) = 1;
+        
+        if learning == true %not sure if works
+            dw = -2*(V(:,j) + regL2*rate(:,j)) - W_rec(:,idx_spiked);
+            dw(idx_spiked) = dw(idx_spiked) - regL2;
+            W_rec(:,idx_spiked) = W_rec(:,idx_spiked) + lr_rec*dw;
+        end
+
+    end
+    rates(:,j+1) = (1 - dt/tau_m) * rates(:,j) + spiketrains(:,j);
+    output(:,j+1) = (1-dt/tau_m) * output(:,j) + W_fwd * spiketrains(:,j+1);
+
+end
+
+
+figure
+plot(t, V);
+title('Membrane voltage of neurons')
+% figure
+% imagesc(W_fwd(:,:,steps+1));
+% figure
+% imagesc(W_rec(:,:,steps+1));
+figure
+hold on
+plot(t, output)
+plot(t, x, '--', 'linewidth', 3)
+title(sprintf('Output of network of %d neurons', n_neurons))
+legend('Network output', 'Input signal')
+xlabel('time /ms')
+set(gca, 'Fontsize', 14)
+
+saveas(gcf, 'figs/png/B2_1_q6.png')
+
